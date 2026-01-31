@@ -1,0 +1,36 @@
+/* 定义弹出的关键帧动画 */
+@keyframes silkySlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.9); /* 初始状态：稍微向下偏移，略微缩小 */
+    filter: blur(2px); /* 增加一点动态模糊，更显高级 */
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1); /* 结束状态：复位 */
+    filter: blur(0);
+  }
+}
+
+.brush-panel,
+.tool-wrap .detail,
+.ScaleControl {
+  /* 应用动画: 0.35秒，使用特定贝塞尔曲线实现丝滑感 */
+  animation: silkySlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  
+  /* 开启硬件加速，防止卡顿 */
+  will-change: transform, opacity;
+  
+  /* 确保变换的原点在底部中心 (对于向上弹出的菜单更自然) */
+  transform-origin: center bottom;
+  
+  /* 优化阴影 (可选，让浮层更有层次感) */
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0,0,0,0.08) !important;
+  
+  /* 确保菜单不被遮挡 */
+  z-index: 9999 !important; 
+}
+
+.preview-footer {
+  background: none !important;
+}
