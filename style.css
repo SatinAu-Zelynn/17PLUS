@@ -14,23 +14,59 @@
 
 .brush-panel,
 .tool-wrap .detail,
-.ScaleControl {
-  /* 应用动画: 0.35秒，使用特定贝塞尔曲线实现丝滑感 */
-  animation: silkySlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
-  
-  /* 开启硬件加速，防止卡顿 */
-  will-change: transform, opacity;
-  
-  /* 确保变换的原点在底部中心 (对于向上弹出的菜单更自然) */
-  transform-origin: center bottom;
-  
-  /* 优化阴影 (可选，让浮层更有层次感) */
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0,0,0,0.08) !important;
-  
-  /* 确保菜单不被遮挡 */
-  z-index: 9999 !important; 
+.ScaleControl,
+.tool-panel,
+.exit-dialog,
+.question-wrap .detail,
+.teach-shape-bar {
+  animation: silkySlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important; /* 应用动画: 0.35秒，使用特定贝塞尔曲线实现丝滑感 */
+  will-change: transform, opacity; /* 开启硬件加速，防止卡顿 */
+  transform-origin: center bottom; /* 确保变换的原点在底部中心 (对于向上弹出的菜单更自然) */
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0,0,0,0.08) !important; /* 优化阴影 */
+  z-index: 9999 !important; /* 确保菜单不被遮挡 */
+  background: rgba(30,30,30,0.5) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  backdrop-filter: blur(18px) saturate(180%);
 }
 
-.preview-footer {
+.preview-footer, .RollCall .footer-box {
   background: none !important;
+}
+
+.tool-wrap .detail .btn,
+.question-wrap .detail .btn {
+  border-right: none !important;
+  border-bottom: none !important;
+}
+
+.preview-footer .group {
+  padding: 8px 8px 0 !important;
+  border-radius: 16px 16px !important;
+}
+
+.page-wrap {
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  backdrop-filter: blur(18px) saturate(180%);
+}
+
+.thumbnail{
+  animation: silkySlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important; /* 应用动画: 0.35秒，使用特定贝塞尔曲线实现丝滑感 */
+  will-change: transform, opacity; /* 开启硬件加速，防止卡顿 */
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  backdrop-filter: blur(18px) saturate(180%);
+}
+
+.RollCall{
+  background: rgba(30,30,30,0.5) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  backdrop-filter: blur(18px) saturate(180%);
+}
+
+.aiChatButtonWrapper, .toast-container{
+  opacity: 0;
+}
+
+.preview-page .jx-draw-board, .preview-page .board-icon{
+  animation: silkySlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important; /* 应用动画: 0.35秒，使用特定贝塞尔曲线实现丝滑感 */
+  will-change: transform, opacity; /* 开启硬件加速，防止卡顿 */
 }
