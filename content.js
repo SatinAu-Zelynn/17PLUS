@@ -32,17 +32,40 @@ function syncSettings() {
     });
 }
 
-// 1. 初始化时同步一次
+function updateLocalStorage(key, value) {
+    if (value === undefined || value === null) {
+        localStorage.removeItem(key);
+    } else {
+        localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value));
+    }
+}
+
+function syncSettings() {
+    chrome.storage.local.get(['customList', 'enableCustom', 'mode', 'modifyConfig'], (items) => {
+        // 同步开关
+        updateLocalStorage('17PLUS_ENABLE', items.enableCustom ? 'true' : 'false');
+        
+        // 同步模式
+        updateLocalStorage('17PLUS_MODE', items.mode || 'replace');
+
+        // 同步替换列表
+        if (items.customList) {
+            updateLocalStorage('17PLUS_LIST_REPLACE', items.customList);
+        }
+
+        // 同步增删改配置
+        if (items.modifyConfig) {
+            updateLocalStorage('17PLUS_CONFIG_MODIFY', items.modifyConfig);
+        }
+    });
+}
+
+// 初始化同步
 syncSettings();
 
-// 2. 监听选项页面的更改，实时更新
+// 监听变化
 chrome.storage.onChanged.addListener((changes, area) => {
     if (area === 'local') {
-        if (changes.customList) {
-            updateLocalStorage('17PLUS_CUSTOM_LIST', JSON.stringify(changes.customList.newValue));
-        }
-        if (changes.enableCustom) {
-            updateLocalStorage('17PLUS_ENABLE_CUSTOM', changes.enableCustom.newValue ? 'true' : 'false');
-        }
+        syncSettings(); // 简单起见，任何变化都重新全量同步一次
     }
 });

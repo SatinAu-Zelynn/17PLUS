@@ -23,7 +23,7 @@
 
 ## 使用方法
 
-下载Release中的crx文件，直接使用可能会被浏览器拦截，可以打开浏览器插件页面的开发者模式加载解压缩的扩展
+下载[Release](https://github.com/SatinAu-Zelynn/17PLUS/releases)中的crx文件，直接使用可能会被浏览器拦截，可以打开浏览器插件页面的开发者模式加载解压缩的扩展
 
 <div align="right">
 <table><td>

@@ -1,101 +1,155 @@
 (function() {
-    console.log('[17PLUS] Hook injected (Targeted Mode).');
+    console.log('[17PLUS] Hook injected (Enhanced Mode).');
 
-    // 获取自定义名单
-    function getCustomList() {
+    // === 读取配置工具函数 ===
+    function getConfig() {
         try {
-            const raw = localStorage.getItem('17PLUS_CUSTOM_LIST');
-            return raw ? JSON.parse(raw) : null;
+            return {
+                enabled: localStorage.getItem('17PLUS_ENABLE') === 'true',
+                mode: localStorage.getItem('17PLUS_MODE') || 'replace', // 'replace' | 'modify'
+                replaceList: JSON.parse(localStorage.getItem('17PLUS_LIST_REPLACE') || '[]'),
+                modifyConfig: JSON.parse(localStorage.getItem('17PLUS_CONFIG_MODIFY') || '{"add":[],"del":[],"rename":{}}')
+            };
         } catch (e) { return null; }
-    }
-
-    // 是否开启
-    function isEnabled() {
-        return localStorage.getItem('17PLUS_ENABLE_CUSTOM') === 'true';
     }
 
     const originalXHR = window.XMLHttpRequest;
     const originalOpen = originalXHR.prototype.open;
     const originalSend = originalXHR.prototype.send;
 
-    // 拦截 Open 获取 URL
     originalXHR.prototype.open = function(method, url) {
-        this._url = url; 
+        this._url = url;
         return originalOpen.apply(this, arguments);
     };
 
-    // 拦截 Send 修改数据
     originalXHR.prototype.send = function(body) {
-        // 只有开启且有名单时才监听
-        if (isEnabled() && getCustomList()) {
+        const config = getConfig();
+        if (config && config.enabled) {
             this.addEventListener('readystatechange', function() {
                 if (this.readyState === 4) {
-                    const url = this._url;
-                    const customList = getCustomList();
-
-                    // === 基础配置接口 (包含 studentList) ===
-                    if (url.includes('queryConfigData.vpage')) {
-                        console.log('[17PLUS] 拦截到配置接口:', url);
-                        try {
-                            const json = JSON.parse(this.responseText);
-                            
-                            // 确保路径存在: data -> classList
-                            if (json.data && json.data.classList && Array.isArray(json.data.classList)) {
-                                // 遍历所有班级，替换名单
-                                json.data.classList.forEach(cls => {
-                                    // 根据自定义名单生成新的 studentList 结构
-                                    cls.studentList = customList.map((name, index) => ({
-                                        stuId: 990000 + index, // 生成伪造 ID
-                                        studentNumber: "C" + (20240000 + index),
-                                        stuName: name // 核心修改：名字
-                                    }));
-                                    cls.allHaveStuNumber = 1; // 确保数据一致性
-                                });
-
-                                // 覆写响应
-                                overrideResponse(this, json);
-                            }
-                        } catch (e) { console.error('[17PLUS] Config patch failed', e); }
-                    }
-
-                    // === 奖励/积分接口 (点名器可能用这个列表) ===
-                    else if (url.includes('queryTodayMultiClassReward.vpage')) {
-                        console.log('[17PLUS] 拦截到奖励接口:', url);
-                        try {
-                            const json = JSON.parse(this.responseText);
-                            
-                            // 结构: data 是一个数组
-                            if (json.data && Array.isArray(json.data)) {
-                                json.data.forEach(cls => {
-                                    // 默认头像地址（从您提供的数据中提取）
-                                    const defaultAvatar = "https://cdn-jiaoxue.17zuoye.cn/jiaoxue-point-matrix-pen/icon/avator_default.png";
-                                    
-                                    // 替换 list
-                                    cls.list = customList.map((name, index) => ({
-                                        studentId: 990000 + index,
-                                        score: 0,
-                                        isDefaultAvatorImg: 1,
-                                        studentName: name, // 核心修改：名字
-                                        avatorUrl: defaultAvatar
-                                    }));
-                                });
-
-                                // 覆写响应
-                                overrideResponse(this, json);
-                            }
-                        } catch (e) { console.error('[17PLUS] Reward patch failed', e); }
-                    }
+                    processResponse(this, config);
                 }
             });
         }
         return originalSend.apply(this, arguments);
     };
 
-    // 覆写 XHR 响应
+    function processResponse(xhr, config) {
+        const url = xhr._url;
+        
+        // 班级配置接口 (queryConfigData)
+        if (url.includes('queryConfigData.vpage')) {
+            try {
+                const json = JSON.parse(xhr.responseText);
+                if (json.data && json.data.classList) {
+                    json.data.classList.forEach(cls => {
+                        // 字段映射：该接口使用 stuName, stuId, studentNumber
+                        const adapter = {
+                            nameField: 'stuName',
+                            idField: 'stuId',
+                            createItem: (name, idx) => ({
+                                stuId: 880000000 + idx, // 使用大额ID避免冲突
+                                studentNumber: "C" + (20250000 + idx),
+                                stuName: name
+                            })
+                        };
+                        
+                        cls.studentList = applyListLogic(cls.studentList, config, adapter);
+                        cls.allHaveStuNumber = 1;
+                    });
+                    overrideResponse(xhr, json);
+                }
+            } catch (e) { console.error('[17PLUS] Config patch error', e); }
+        }
+
+        // 奖励接口 (queryTodayMultiClassReward)
+        else if (url.includes('queryTodayMultiClassReward.vpage')) {
+            try {
+                const json = JSON.parse(xhr.responseText);
+                if (json.data && Array.isArray(json.data)) {
+                    json.data.forEach(cls => {
+                        // 字段映射：该接口使用 studentName, studentId, avatorUrl
+                        const adapter = {
+                            nameField: 'studentName',
+                            idField: 'studentId',
+                            createItem: (name, idx) => ({
+                                studentId: 880000000 + idx,
+                                score: 0,
+                                isDefaultAvatorImg: 1,
+                                studentName: name,
+                                avatorUrl: "https://cdn-jiaoxue.17zuoye.cn/jiaoxue-point-matrix-pen/icon/avator_default.png"
+                            })
+                        };
+
+                        cls.list = applyListLogic(cls.list, config, adapter);
+                    });
+                    overrideResponse(xhr, json);
+                }
+            } catch (e) { console.error('[17PLUS] Reward patch error', e); }
+        }
+    }
+
+    /**
+     * 通用名单处理逻辑
+     * @param {Array} originalList 原始数据列表
+     * @param {Object} config 全局配置对象
+     * @param {Object} adapter 针对不同接口的字段适配器
+     */
+    function applyListLogic(originalList, config, adapter) {
+        let resultList = [];
+
+        // === 完全替换 ===
+        if (config.mode === 'replace') {
+            if (config.replaceList && config.replaceList.length > 0) {
+                resultList = config.replaceList.map((name, i) => adapter.createItem(name, i));
+            } else {
+                resultList = originalList; // 如果替换列表为空，保持原样
+            }
+        } 
+        
+        // === 增删改 ===
+        else if (config.mode === 'modify') {
+            const { add, del, rename } = config.modifyConfig;
+            
+            // 复制原始列表
+            let currentList = originalList ? [...originalList] : [];
+
+            // 执行删除 (Filter)
+            // 如果 del 列表包含该名字，则过滤掉
+            if (del && del.length > 0) {
+                currentList = currentList.filter(item => {
+                    const name = item[adapter.nameField];
+                    return !del.includes(name);
+                });
+            }
+
+            // 执行修改 (Map)
+            // 检查 rename Map 是否有匹配的 key
+            if (rename) {
+                currentList.forEach(item => {
+                    const oldName = item[adapter.nameField];
+                    if (rename[oldName]) {
+                        item[adapter.nameField] = rename[oldName];
+                    }
+                });
+            }
+
+            // 执行添加 (Push)
+            if (add && add.length > 0) {
+                const newItems = add.map((name, i) => adapter.createItem(name, Date.now() + i));
+                currentList = currentList.concat(newItems);
+            }
+
+            resultList = currentList;
+        }
+
+        return resultList;
+    }
+
     function overrideResponse(xhr, json) {
         const newText = JSON.stringify(json);
         Object.defineProperty(xhr, 'responseText', { value: newText });
         Object.defineProperty(xhr, 'response', { value: newText });
-        console.log('[17PLUS] 名单替换成功！当前人数:', getCustomList().length);
+        console.log('[17PLUS] 名单数据已修改');
     }
 })();
