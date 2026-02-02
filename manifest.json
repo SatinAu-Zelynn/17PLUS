@@ -1,17 +1,27 @@
 {
   "manifest_version": 3,
   "name": "17PLUS",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "闵智作业平台增强插件",
   "icons": { "128": "icon.png" },
+  "permissions": [
+    "storage" 
+  ],
   "content_scripts": [
     {
       "matches": [
         "*://ppc.17zuoye.com/*",
         "*://*.17zuoye.cn/*"
       ],
+      "js": ["content.js"],
       "css": ["style.css"],
-      "run_at": "document_end"
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["hook.js"],
+      "matches": ["<all_urls>"]
     }
   ]
 }

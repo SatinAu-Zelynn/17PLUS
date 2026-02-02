@@ -70,3 +70,111 @@
   animation: silkySlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important; /* 应用动画: 0.35秒，使用特定贝塞尔曲线实现丝滑感 */
   will-change: transform, opacity; /* 开启硬件加速，防止卡顿 */
 }
+
+/* 入口按钮 */
+.plus-toggle-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background: rgba(30, 30, 30, 0.8);
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 40px;
+    cursor: pointer;
+    z-index: 10000;
+    font-size: 20px;
+    transition: transform 0.3s;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.plus-toggle-btn:hover {
+    transform: rotate(90deg);
+}
+
+/* 设置面板 */
+.plus-settings-panel {
+    position: fixed;
+    bottom: 70px;
+    right: 20px;
+    width: 300px;
+    background: rgba(40, 40, 40, 0.95);
+    backdrop-filter: blur(18px) saturate(180%);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    color: white;
+    z-index: 10000;
+    transform: translateY(20px);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.plus-settings-panel.active {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.plus-settings-panel h3 {
+    margin: 0 0 15px 0;
+    font-size: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    padding-bottom: 10px;
+}
+
+.setting-item {
+    margin-bottom: 15px;
+}
+
+#plus-student-list {
+    width: 100%;
+    height: 150px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    padding: 8px;
+    border-radius: 6px;
+    resize: vertical;
+}
+
+.setting-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#plus-save-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 6px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#plus-save-btn:hover {
+    background: #0056b3;
+}
+
+.plus-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #aaa;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.setting-tip {
+    font-size: 12px;
+    color: #aaa;
+    margin-top: 10px;
+}
