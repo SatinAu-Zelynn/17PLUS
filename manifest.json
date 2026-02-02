@@ -1,12 +1,16 @@
 {
   "manifest_version": 3,
   "name": "17PLUS",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "闵智作业平台增强插件",
   "icons": { "128": "icon.png" },
   "permissions": [
-    "storage" 
+    "storage"
   ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "17PLUS 设置"
+  },
   "content_scripts": [
     {
       "matches": [

@@ -1,4 +1,5 @@
 // 注入拦截脚本 (Hook)
+// 保持尽早注入，以确保能拦截到最早的 XHR 初始化
 const script = document.createElement('script');
 script.src = chrome.runtime.getURL('hook.js');
 script.onload = function() {
@@ -6,70 +7,42 @@ script.onload = function() {
 };
 (document.head || document.documentElement).appendChild(script);
 
+// === 配置同步逻辑 ===
+// hook.js 运行在页面上下文，无法直接访问 chrome.storage
+// content.js 负责从 chrome.storage 读取配置并写入 window.localStorage 供 hook.js 使用
 
-// 创建 UI 面板
-function createSettingsPanel() {
-    const panel = document.createElement('div');
-    panel.className = 'plus-settings-panel';
-    panel.innerHTML = `
-        <h3>17PLUS 设置</h3>
-        <div class="setting-item">
-            <label>
-                <input type="checkbox" id="plus-enable-custom"> 启用自定义点名名单
-            </label>
-        </div>
-        <div class="setting-item">
-            <textarea id="plus-student-list" placeholder="在此输入名单，每行一个名字"></textarea>
-        </div>
-        <div class="setting-actions">
-            <button id="plus-save-btn">保存并生效</button>
-            <span id="plus-msg"></span>
-        </div>
-        <div class="setting-tip">提示：保存后请刷新页面重新加载资源。</div>
-        <button class="plus-close-btn">×</button>
-    `;
-    document.body.appendChild(panel);
-
-    // 浮动入口按钮
-    const toggleBtn = document.createElement('div');
-    toggleBtn.className = 'plus-toggle-btn';
-    toggleBtn.innerText = '⚙️';
-    toggleBtn.title = '17PLUS 设置';
-    toggleBtn.onclick = () => {
-        panel.classList.toggle('active');
-        loadSettings();
-    };
-    document.body.appendChild(toggleBtn);
-
-    // 事件绑定
-    panel.querySelector('.plus-close-btn').onclick = () => panel.classList.remove('active');
-
-    const saveBtn = document.getElementById('plus-save-btn');
-    const textarea = document.getElementById('plus-student-list');
-    const checkbox = document.getElementById('plus-enable-custom');
-    const msg = document.getElementById('plus-msg');
-
-    function loadSettings() {
-        const savedList = localStorage.getItem('17PLUS_CUSTOM_LIST');
-        if (savedList) {
-            textarea.value = JSON.parse(savedList).join('\n');
-        }
-        checkbox.checked = localStorage.getItem('17PLUS_ENABLE_CUSTOM') === 'true';
+function updateLocalStorage(key, value) {
+    if (value === undefined || value === null) {
+        localStorage.removeItem(key);
+    } else {
+        localStorage.setItem(key, value);
     }
+}
 
-    saveBtn.onclick = () => {
-        const names = textarea.value.split('\n').map(n => n.trim()).filter(n => n);
-        localStorage.setItem('17PLUS_CUSTOM_LIST', JSON.stringify(names));
-        localStorage.setItem('17PLUS_ENABLE_CUSTOM', checkbox.checked);
+function syncSettings() {
+    chrome.storage.local.get(['customList', 'enableCustom'], (items) => {
+        // 同步名单
+        if (items.customList) {
+            updateLocalStorage('17PLUS_CUSTOM_LIST', JSON.stringify(items.customList));
+        }
         
-        msg.innerText = '已保存! 请刷新页面';
-        setTimeout(() => msg.innerText = '', 2000);
-    };
+        // 同步开关 (hook.js 期望的是字符串 'true')
+        const enableStr = items.enableCustom ? 'true' : 'false';
+        updateLocalStorage('17PLUS_ENABLE_CUSTOM', enableStr);
+    });
 }
 
-// 等待页面加载后创建 UI
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', createSettingsPanel);
-} else {
-    createSettingsPanel();
-}
+// 1. 初始化时同步一次
+syncSettings();
+
+// 2. 监听选项页面的更改，实时更新
+chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local') {
+        if (changes.customList) {
+            updateLocalStorage('17PLUS_CUSTOM_LIST', JSON.stringify(changes.customList.newValue));
+        }
+        if (changes.enableCustom) {
+            updateLocalStorage('17PLUS_ENABLE_CUSTOM', changes.enableCustom.newValue ? 'true' : 'false');
+        }
+    }
+});
