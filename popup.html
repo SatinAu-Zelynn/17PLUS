@@ -28,6 +28,32 @@
             color: #333;
             margin: 0;
         }
+        #update-alert {
+            display: none; /* 默认隐藏 */
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+            padding: 8px 10px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            line-height: 1.4;
+            text-align: center;
+        }
+        #update-btn {
+            display: inline-block;
+            margin-top: 4px;
+            background-color: #28a745;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 3px;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        #update-btn:hover {
+            background-color: #218838;
+        }
         h3 {
             margin-top: 0;
             font-size: 16px;
@@ -124,6 +150,11 @@
     </style>
 </head>
 <body>
+    <div id="update-alert">
+        发现新版本 <span id="new-version-code" style="font-weight:bold;"></span><br>
+        <a id="update-btn" href="#" target="_blank">立即下载</a>
+    </div>
+    
     <h3>17PLUS 设置</h3>
     
     <div class="form-group">

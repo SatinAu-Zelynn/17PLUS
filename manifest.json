@@ -1,11 +1,14 @@
 {
   "manifest_version": 3,
   "name": "17PLUS",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "闵智作业平台增强插件",
   "icons": { "128": "icon.png" },
   "permissions": [
     "storage"
+  ],
+  "host_permissions": [
+    "https://cdn-cf.satinau.cn/*"
   ],
   "action": {
     "default_popup": "popup.html",

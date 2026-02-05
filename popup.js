@@ -14,6 +14,87 @@
   limitations under the License.
 */
 
+// --- 自动更新检查逻辑 ---
+
+const UPDATE_API = "https://cdn-cf.satinau.cn/data/version.json";
+const CHECK_INTERVAL = 30 * 60 * 1000; // 检查间隔：30分钟
+
+// 版本号对比函数 (return true if v2 > v1)
+function hasNewVersion(localVer, remoteVer) {
+    if (!remoteVer) return false;
+    const v1 = localVer.split('.').map(Number);
+    const v2 = remoteVer.split('.').map(Number);
+    
+    for (let i = 0; i < Math.max(v1.length, v2.length); i++) {
+        const num1 = v1[i] || 0;
+        const num2 = v2[i] || 0;
+        if (num2 > num1) return true;
+        if (num2 < num1) return false;
+    }
+    return false;
+}
+
+// 检查更新主函数
+function checkUpdate() {
+    chrome.storage.local.get(['lastCheckTime', 'cachedUpdateInfo'], (data) => {
+        const now = Date.now();
+        const currentVer = chrome.runtime.getManifest().version;
+
+        // 如果缓存中有更新信息，且本地版本仍旧旧于缓存的新版本，先显示缓存的提示
+        if (data.cachedUpdateInfo && hasNewVersion(currentVer, data.cachedUpdateInfo.version)) {
+            showUpdateUI(data.cachedUpdateInfo.version, data.cachedUpdateInfo.download);
+        }
+
+        // 判断是否需要发起网络请求 (超过间隔时间)
+        if (!data.lastCheckTime || (now - data.lastCheckTime > CHECK_INTERVAL)) {
+            fetch(UPDATE_API)
+                .then(response => response.json())
+                .then(items => {
+                    // 找到 name 为 17plus 的项目
+                    const target = items.find(item => item.name === '17plus');
+                    if (target && hasNewVersion(currentVer, target.version)) {
+                        // 发现新版本，更新缓存并显示
+                        const updateInfo = {
+                            version: target.version,
+                            download: target.download
+                        };
+                        
+                        chrome.storage.local.set({
+                            lastCheckTime: now,
+                            cachedUpdateInfo: updateInfo
+                        });
+                        
+                        showUpdateUI(target.version, target.download);
+                    } else {
+                        // 没有新版本，仅更新检查时间，清除旧的更新缓存
+                        chrome.storage.local.set({
+                            lastCheckTime: now,
+                            cachedUpdateInfo: null
+                        });
+                    }
+                })
+                .catch(err => console.error("检查更新失败:", err));
+        }
+    });
+}
+
+// 显示更新 UI
+function showUpdateUI(version, url) {
+    const alertBox = document.getElementById('update-alert');
+    const verSpan = document.getElementById('new-version-code');
+    const btn = document.getElementById('update-btn');
+
+    if (alertBox && verSpan && btn) {
+        verSpan.textContent = `${version}`;
+        // 点击按钮打开新标签页
+        btn.onclick = (e) => {
+            e.preventDefault();
+            chrome.tabs.create({ url: url });
+        };
+        alertBox.style.display = 'block';
+    }
+}
+
 function togglePanels() {
     const mode = document.querySelector('input[name="mode"]:checked').value;
     document.getElementById('panel-replace').classList.toggle('active', mode === 'replace');
@@ -92,6 +173,7 @@ function restoreOptions() {
         }
 
         togglePanels(); // 初始化面板显示
+        checkUpdate();
     });
 }
 
