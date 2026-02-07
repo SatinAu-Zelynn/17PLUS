@@ -25,6 +25,13 @@
 
 下载[Release](https://github.com/SatinAu-Zelynn/17PLUS/releases)中的17PLUS.crx和allow-extension.bat，先打开浏览器chrome://extensions或edge://extensions中的开发人员模式，运行下载的allow-extension.bat，然后将17PLUS.crx拖入浏览器的扩展程序页面即可使用。
 
+
+在扩展页面删除扩展后需要在 **终端（管理员）** 中运行以下命令，删除注册表中的白名单
+```
+reg delete HKLM\SOFTWARE\Policies\Google\Chrome\ExtensionInstallAllowlist /f
+reg delete HKLM\SOFTWARE\Policies\Microsoft\Edge\ExtensionInstallAllowlist /f
+```
+
 <div align="right">
 <table><td>
 <a href="#17PLUS">👆 返回顶部</a>
