@@ -23,7 +23,7 @@
 
 ## 使用方法
 
-下载[Release](https://github.com/SatinAu-Zelynn/17PLUS/releases)中的crx文件，直接使用可能会被浏览器拦截，可以打开浏览器插件页面的开发者模式加载解压缩的扩展
+下载[Release](https://github.com/SatinAu-Zelynn/17PLUS/releases)中的17PLUS.crx和allow-extension.bat，先打开浏览器chrome://extensions或edge://extensions中的开发人员模式，运行下载的allow-extension.bat，然后将17PLUS.crx拖入浏览器的扩展程序页面即可使用。
 
 <div align="right">
 <table><td>
