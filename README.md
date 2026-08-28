@@ -1,6 +1,6 @@
 <div align="center">
 
-<img width="" src="icon.png"  width=120 height=120  align="center">
+<img width="" src="icon.png" width=120 height=120 align="center">
 
 # 17PLUS
 
@@ -21,16 +21,18 @@
 
 - 自定义点名名单
 
-## 使用方法
+## 安装与使用
 
-下载[Release](https://github.com/SatinAu-Zelynn/17PLUS/releases)中的17PLUS.crx和allow-extension.bat，先打开浏览器chrome://extensions或edge://extensions中的开发人员模式，运行下载的allow-extension.bat，然后将17PLUS.crx拖入浏览器的扩展程序页面即可使用。
+### 方式一：商店安装（推荐）
 
+- **Microsoft Edge 扩展商店**：[立即前往安装 17PLUS](https://microsoftedge.microsoft.com/addons/detail/17plus/knmblgbbkmgbeapohpoemnahfhbagcon?hl=zh-CN)
 
-在扩展页面删除扩展后需要在 **终端（管理员）** 中运行以下命令，删除注册表中的白名单
-```
-reg delete HKLM\SOFTWARE\Policies\Google\Chrome\ExtensionInstallAllowlist /f
-reg delete HKLM\SOFTWARE\Policies\Microsoft\Edge\ExtensionInstallAllowlist /f
-```
+### 方式二：手动安装
+
+1. 下载 [Releases](https://github.com/SatinAu-Zelynn/17PLUS/releases) 中的 `17PLUS.crx` 文件。
+2. 打开浏览器扩展管理页面（Chrome 输入 `chrome://extensions`，Edge 输入 `edge://extensions`）。
+3. 开启页面中的 **开发者模式**。
+4. 将下载的 `17PLUS.crx` 文件直接拖拽进扩展管理页面即可完成安装。
 
 <div align="right">
 <table><td>
