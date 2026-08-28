@@ -7,9 +7,6 @@
   "permissions": [
     "storage"
   ],
-  "host_permissions": [
-    "https://cdn-cf.satinau.cn/*"
-  ],
   "action": {
     "default_popup": "popup.html",
     "default_title": "17PLUS 设置"
