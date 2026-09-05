@@ -28,66 +28,82 @@
   }
 }
 
-.brush-panel,
-.tool-wrap .detail,
-.ScaleControl,
-.tool-panel,
-.exit-dialog,
-.question-wrap .detail,
-.teach-shape-bar {
-  animation: silkySlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important; /* 应用动画: 0.35秒，使用特定贝塞尔曲线实现丝滑感 */
-  will-change: transform, opacity; /* 开启硬件加速，防止卡顿 */
-  transform-origin: center bottom; /* 确保变换的原点在底部中心 (对于向上弹出的菜单更自然) */
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0,0,0,0.08) !important; /* 优化阴影 */
-  z-index: 9999 !important; /* 确保菜单不被遮挡 */
+/* 仅在未禁用动画时应用进场动画 */
+:root:not(.plus-disable-anim) .brush-panel,
+:root:not(.plus-disable-anim) .tool-wrap .detail,
+:root:not(.plus-disable-anim) .ScaleControl,
+:root:not(.plus-disable-anim) .tool-panel,
+:root:not(.plus-disable-anim) .exit-dialog,
+:root:not(.plus-disable-anim) .question-wrap .detail,
+:root:not(.plus-disable-anim) .teach-shape-bar,
+:root:not(.plus-disable-anim) .thumbnail,
+:root:not(.plus-disable-anim) .preview-page .jx-draw-board,
+:root:not(.plus-disable-anim) .preview-page .board-icon {
+  animation: silkySlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  will-change: transform, opacity;
+  transform-origin: center bottom;
+}
+
+/* 仅在未禁用毛玻璃时应用半透明背景、阴影和高斯模糊 */
+:root:not(.plus-disable-blur) .brush-panel,
+:root:not(.plus-disable-blur) .tool-wrap .detail,
+:root:not(.plus-disable-blur) .ScaleControl,
+:root:not(.plus-disable-blur) .tool-panel,
+:root:not(.plus-disable-blur) .exit-dialog,
+:root:not(.plus-disable-blur) .question-wrap .detail,
+:root:not(.plus-disable-blur) .teach-shape-bar {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0,0,0,0.08) !important;
+  z-index: 9999 !important;
   background: rgba(30,30,30,0.5) !important;
   -webkit-backdrop-filter: blur(18px) saturate(180%);
   backdrop-filter: blur(18px) saturate(180%);
 }
 
-.preview-footer, .RollCall .footer-box {
+:root:not(.plus-disable-blur) .preview-footer,
+:root:not(.plus-disable-blur) .RollCall .footer-box {
   background: none !important;
 }
 
-.tool-wrap .detail .btn,
-.question-wrap .detail .btn {
+:root:not(.plus-disable-blur) .tool-wrap .detail .btn,
+:root:not(.plus-disable-blur) .question-wrap .detail .btn {
   border-right: none !important;
   border-bottom: none !important;
 }
 
-.tool-panel .group {
-    padding: 8px !important;
-    border-radius: 16px !important;
+:root:not(.plus-disable-blur) .tool-panel .group {
+  padding: 8px !important;
+  border-radius: 16px !important;
 }
 
-.page-wrap {
+:root:not(.plus-disable-blur) .page-wrap {
   -webkit-backdrop-filter: blur(18px) saturate(180%);
   backdrop-filter: blur(18px) saturate(180%);
 }
 
-.thumbnail {
-  animation: silkySlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important; /* 应用动画: 0.35秒，使用特定贝塞尔曲线实现丝滑感 */
-  will-change: transform, opacity; /* 开启硬件加速，防止卡顿 */
+:root:not(.plus-disable-blur) .thumbnail {
   -webkit-backdrop-filter: blur(18px) saturate(180%);
   backdrop-filter: blur(18px) saturate(180%);
 }
 
-.RollCall {
+:root:not(.plus-disable-blur) .RollCall {
   background: rgba(30,30,30,0.5) !important;
   -webkit-backdrop-filter: blur(18px) saturate(180%);
   backdrop-filter: blur(18px) saturate(180%);
 }
 
-.aiChatButtonWrapper, .toast-container {
+:root:not(.plus-disable-blur) .el-overlay {
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.toast-container {
   opacity: 0;
 }
 
-.preview-page .jx-draw-board, .preview-page .board-icon {
-  animation: silkySlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important; /* 应用动画: 0.35秒，使用特定贝塞尔曲线实现丝滑感 */
-  will-change: transform, opacity; /* 开启硬件加速，防止卡顿 */
-}
-
-.el-overlay {
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+/* 仅在开启“隐藏 AI 浮窗”时生效 */
+:root.plus-hide-ai .aiChatButtonWrapper {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
 }

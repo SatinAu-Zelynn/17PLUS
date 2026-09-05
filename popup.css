@@ -107,11 +107,30 @@ body {
   margin-bottom: 14px;
 }
 
+.title-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
 h3 {
   margin: 0;
   font-size: 16px;
   font-weight: 700;
   letter-spacing: -0.2px;
+}
+
+.author-link {
+  font-size: 11px;
+  color: var(--word-sub-color);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.author-link:hover {
+  color: var(--primary-color);
+  text-decoration: underline;
 }
 
 /* ========== 功能开关 (Setting Item) ========== */
@@ -421,4 +440,18 @@ textarea::-webkit-scrollbar-thumb {
 .toast.show {
   opacity: 1;
   transform: translateX(-50%) translateY(0) scale(1);
+}
+
+/* ========== 二级页面视图控制 ========== */
+.main-nav {
+  margin-bottom: 12px;
+}
+
+.page-view {
+  display: none;
+}
+
+.page-view.active {
+  display: block;
+  animation: blurFadeUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }

@@ -14,20 +14,56 @@
   limitations under the License.
 */
 
+let currentPage = 'feature';
 let currentMode = 'replace';
+let toastTimer = null;
 
 // SatinAu iOS 风格 Toast 提示
 function showToast(msg) {
   const toast = document.getElementById('toast');
   if (!toast) return;
+  if (toastTimer) clearTimeout(toastTimer);
   toast.textContent = msg;
   toast.classList.add('show');
-  setTimeout(() => {
+  toastTimer = setTimeout(() => {
     toast.classList.remove('show');
+    toastTimer = null;
   }, 1600);
 }
 
-// 切换面板及分段控制器滑块
+// 精确更新指定分段控制器的滑块位置
+function updateGlider(controlEl, activeBtn) {
+  const glider = controlEl.querySelector('.segment-glider');
+  if (glider && activeBtn) {
+    glider.style.transform = `translateX(${activeBtn.offsetLeft}px)`;
+    glider.style.width = `${activeBtn.offsetWidth}px`;
+  }
+}
+
+// 切换二级主页面 (功能 / 界面)
+function setPage(page) {
+  currentPage = page;
+  const isFeature = page === 'feature';
+  
+  document.getElementById('page-feature').classList.toggle('active', isFeature);
+  document.getElementById('page-ui').classList.toggle('active', !isFeature);
+
+  const nav = document.getElementById('pageNavControl');
+  nav.querySelectorAll('.segment-btn').forEach(btn => {
+    const active = btn.dataset.page === page;
+    btn.classList.toggle('active', active);
+    if (active) updateGlider(nav, btn);
+  });
+
+  // 切回功能页时重新校准模式滑块
+  if (isFeature) {
+    const modeControl = document.getElementById('modeControl');
+    const activeModeBtn = modeControl.querySelector('.segment-btn.active');
+    if (activeModeBtn) updateGlider(modeControl, activeModeBtn);
+  }
+}
+
+// 切换模式面板及模式分段控制器滑块
 function setMode(mode) {
   currentMode = mode;
   const isReplace = mode === 'replace';
@@ -35,26 +71,26 @@ function setMode(mode) {
   document.getElementById('panel-replace').classList.toggle('active', isReplace);
   document.getElementById('panel-modify').classList.toggle('active', !isReplace);
 
-  const glider = document.querySelector('.segment-glider');
-  const buttons = document.querySelectorAll('.segment-btn');
-
-  buttons.forEach(btn => {
+  const control = document.getElementById('modeControl');
+  control.querySelectorAll('.segment-btn').forEach(btn => {
     const active = btn.dataset.value === mode;
     btn.classList.toggle('active', active);
-    if (active && glider) {
-      glider.style.transform = `translateX(${btn.offsetLeft}px)`;
-      glider.style.width = `${btn.offsetWidth}px`;
-    }
+    if (active) updateGlider(control, btn);
   });
 }
 
 // 初始化分段控制器
 function initSegmentedControl() {
-  const buttons = document.querySelectorAll('.segment-btn');
-  buttons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      setMode(btn.dataset.value);
-    });
+  // 主页面切换
+  const nav = document.getElementById('pageNavControl');
+  nav.querySelectorAll('.segment-btn').forEach(btn => {
+    btn.addEventListener('click', () => setPage(btn.dataset.page));
+  });
+
+  // 模式切换
+  const modeControl = document.getElementById('modeControl');
+  modeControl.querySelectorAll('.segment-btn').forEach(btn => {
+    btn.addEventListener('click', () => setMode(btn.dataset.value));
   });
 }
 
@@ -62,6 +98,11 @@ function initSegmentedControl() {
 function saveOptions() {
   const enableCustom = document.getElementById('enableCustom').checked;
   
+  // 界面设置
+  const enableAnimation = document.getElementById('enableAnimation').checked;
+  const enableBlur = document.getElementById('enableBlur').checked;
+  const hideAiChat = document.getElementById('hideAiChat').checked;
+
   // 替换列表
   const replaceListRaw = document.getElementById('customList').value;
   const customList = replaceListRaw.split('\n').map(n => n.trim()).filter(Boolean);
@@ -88,7 +129,10 @@ function saveOptions() {
       add: addList,
       del: delList,
       rename: renameMap
-    }
+    },
+    enableAnimation,
+    enableBlur,
+    hideAiChat
   };
 
   chrome.storage.local.set(config, () => {
@@ -102,9 +146,17 @@ function restoreOptions() {
     enableCustom: false,
     mode: 'replace',
     customList: [],
-    modifyConfig: { add: [], del: [], rename: {} }
+    modifyConfig: { add: [], del: [], rename: {} },
+    enableAnimation: true,
+    enableBlur: true,
+    hideAiChat: true
   }, (items) => {
     document.getElementById('enableCustom').checked = items.enableCustom;
+
+    // 恢复界面设置
+    document.getElementById('enableAnimation').checked = items.enableAnimation;
+    document.getElementById('enableBlur').checked = items.enableBlur;
+    document.getElementById('hideAiChat').checked = items.hideAiChat;
 
     // 填充替换列表
     if (items.customList) {
@@ -121,15 +173,32 @@ function restoreOptions() {
       document.getElementById('renameList').value = renameText;
     }
 
-    // 恢复选中的模式及动画滑块
+    // 恢复选中的页面与模式及滑块
     setTimeout(() => {
+      setPage('feature');
       setMode(items.mode || 'replace');
     }, 50);
   });
 }
 
+
 document.addEventListener('DOMContentLoaded', () => {
   initSegmentedControl();
   restoreOptions();
-  document.getElementById('save').addEventListener('click', saveOptions);
+  document.getElementById('save').addEventListener('click', () => saveOptions());
+
+  // 所有 Toggle 开关变动时均即时保存
+  ['enableCustom', 'enableAnimation', 'enableBlur', 'hideAiChat'].forEach(id => {
+    document.getElementById(id).addEventListener('change', () => {
+      saveOptions();
+    });
+  });
+
+  // 网络字体加载完成后精准重校滑块尺寸
+  if (document.fonts) {
+    document.fonts.ready.then(() => {
+      setPage(currentPage);
+      setMode(currentMode);
+    });
+  }
 });

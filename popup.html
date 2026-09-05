@@ -34,62 +34,109 @@
         <div class="header-card">
             <div class="title-wrap">
                 <h3>17PLUS 设置</h3>
+                <a href="https://satinau.cn/" target="_blank" rel="noopener noreferrer" class="author-link">by SatinAu</a>
             </div>
         </div>
 
-        <!-- 功能开关 -->
-        <div class="setting-item">
-            <div class="setting-label">
-                <span class="label-title">启用名单修改</span>
-                <span class="label-desc">开启后将应用下方名单规则</span>
-            </div>
-            <label class="toggle-switch">
-                <input type="checkbox" id="enableCustom">
-                <span class="switch-slider"></span>
-            </label>
-        </div>
-
-        <!-- 模式分段选择器 -->
-        <div class="segmented-control" id="modeControl">
+        <!-- 主导航分段选择器 -->
+        <div class="segmented-control main-nav" id="pageNavControl">
             <div class="segment-glider"></div>
-            <button type="button" class="segment-btn active" data-value="replace">完全替换模式</button>
-            <button type="button" class="segment-btn" data-value="modify">增删改模式</button>
+            <button type="button" class="segment-btn active" data-page="feature">功能</button>
+            <button type="button" class="segment-btn" data-page="ui">界面</button>
         </div>
 
-        <!-- 替换模式面板 -->
-        <div id="panel-replace" class="glass-panel active">
-            <div class="panel-header">
-                <svg class="panel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                <h4>替换名单 (每行一个):</h4>
+        <!-- 功能二级页面 -->
+        <div id="page-feature" class="page-view active">
+            <!-- 功能开关 -->
+            <div class="setting-item">
+                <div class="setting-label">
+                    <span class="label-title">启用名单修改</span>
+                    <span class="label-desc">开启后将应用下方名单规则</span>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="enableCustom">
+                    <span class="switch-slider"></span>
+                </label>
             </div>
-            <textarea id="customList" placeholder="张三&#10;李四&#10;王五"></textarea>
+
+            <!-- 模式分段选择器 -->
+            <div class="segmented-control" id="modeControl">
+                <div class="segment-glider"></div>
+                <button type="button" class="segment-btn active" data-value="replace">完全替换模式</button>
+                <button type="button" class="segment-btn" data-value="modify">增删改模式</button>
+            </div>
+
+            <!-- 替换模式面板 -->
+            <div id="panel-replace" class="glass-panel active">
+                <div class="panel-header">
+                    <svg class="panel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    <h4>替换名单 (每行一个):</h4>
+                </div>
+                <textarea id="customList" placeholder="张三&#10;李四&#10;王五"></textarea>
+            </div>
+
+            <!-- 增删改模式面板 -->
+            <div id="panel-modify" class="glass-panel">
+                <div class="modify-group">
+                    <div class="panel-header">
+                        <span class="step-badge">1</span>
+                        <h4>添加学生 (每行一个):</h4>
+                    </div>
+                    <textarea id="addList" placeholder="新同学A&#10;新同学B"></textarea>
+                </div>
+
+                <div class="modify-group">
+                    <div class="panel-header">
+                        <span class="step-badge">2</span>
+                        <h4>删除学生 (每行一个):</h4>
+                    </div>
+                    <textarea id="delList" placeholder="要删除的名字A"></textarea>
+                </div>
+
+                <div class="modify-group">
+                    <div class="panel-header">
+                        <span class="step-badge">3</span>
+                        <h4>修改名字 (旧名=新名):</h4>
+                    </div>
+                    <div class="note-chip">例如: 张三=张三丰</div>
+                    <textarea id="renameList" placeholder="张三=张三丰&#10;李四=李小四"></textarea>
+                </div>
+            </div>
         </div>
 
-        <!-- 增删改模式面板 -->
-        <div id="panel-modify" class="glass-panel">
-            <div class="modify-group">
-                <div class="panel-header">
-                    <span class="step-badge">1</span>
-                    <h4>添加学生 (每行一个):</h4>
+        <!-- 界面二级页面 -->
+        <div id="page-ui" class="page-view">
+            <div class="setting-item">
+                <div class="setting-label">
+                    <span class="label-title">动画效果</span>
+                    <span class="label-desc">开启面板与菜单的弹出动画</span>
                 </div>
-                <textarea id="addList" placeholder="新同学A&#10;新同学B"></textarea>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="enableAnimation" checked>
+                    <span class="switch-slider"></span>
+                </label>
             </div>
 
-            <div class="modify-group">
-                <div class="panel-header">
-                    <span class="step-badge">2</span>
-                    <h4>删除学生 (每行一个):</h4>
+            <div class="setting-item">
+                <div class="setting-label">
+                    <span class="label-title">毛玻璃模糊</span>
+                    <span class="label-desc">开启面板与弹窗的高斯模糊背景</span>
                 </div>
-                <textarea id="delList" placeholder="要删除的名字A"></textarea>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="enableBlur" checked>
+                    <span class="switch-slider"></span>
+                </label>
             </div>
 
-            <div class="modify-group">
-                <div class="panel-header">
-                    <span class="step-badge">3</span>
-                    <h4>修改名字 (旧名=新名):</h4>
+            <div class="setting-item">
+                <div class="setting-label">
+                    <span class="label-title">隐藏 AI 浮窗</span>
+                    <span class="label-desc">隐藏页面中的 AI 助手悬浮入口</span>
                 </div>
-                <div class="note-chip">例如: 张三=张三丰</div>
-                <textarea id="renameList" placeholder="张三=张三丰&#10;李四=李小四"></textarea>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="hideAiChat" checked>
+                    <span class="switch-slider"></span>
+                </label>
             </div>
         </div>
 

@@ -31,33 +31,76 @@ function updateLocalStorage(key, value) {
     if (value === undefined || value === null) {
         localStorage.removeItem(key);
     } else {
-        localStorage.setItem(key, value);
-    }
-}
-
-function syncSettings() {
-    chrome.storage.local.get(['customList', 'enableCustom'], (items) => {
-        // 同步名单
-        if (items.customList) {
-            updateLocalStorage('17PLUS_CUSTOM_LIST', JSON.stringify(items.customList));
-        }
-        
-        // 同步开关 (hook.js 期望的是字符串 'true')
-        const enableStr = items.enableCustom ? 'true' : 'false';
-        updateLocalStorage('17PLUS_ENABLE_CUSTOM', enableStr);
-    });
-}
-
-function updateLocalStorage(key, value) {
-    if (value === undefined || value === null) {
-        localStorage.removeItem(key);
-    } else {
         localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value));
     }
 }
 
+let cachedUISettings = {
+    enableAnimation: true,
+    enableBlur: true,
+    hideAiChat: true
+};
+
+function applyUISettings(items) {
+    if (items) {
+        cachedUISettings = {
+            enableAnimation: items.enableAnimation !== false,
+            enableBlur: items.enableBlur !== false,
+            hideAiChat: items.hideAiChat !== false
+        };
+    }
+
+    const updateClasses = () => {
+        const root = document.documentElement;
+        if (!root) return;
+        root.classList.toggle('plus-disable-anim', !cachedUISettings.enableAnimation);
+        root.classList.toggle('plus-disable-blur', !cachedUISettings.enableBlur);
+        root.classList.toggle('plus-hide-ai', cachedUISettings.hideAiChat);
+    };
+
+    updateClasses();
+
+    // 网页加载各阶段持续确保 class 存在，防止被页面原生 HTML 覆盖
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', updateClasses, { once: true });
+    }
+}
+
+// 监听根节点 class 变动，防止页面框架（Vue/Element 等）挂载时重写冲掉插件标记
+const classObserver = new MutationObserver(() => {
+    const root = document.documentElement;
+    if (!root) return;
+    const disableAnim = !cachedUISettings.enableAnimation;
+    const disableBlur = !cachedUISettings.enableBlur;
+    const hideAi = cachedUISettings.hideAiChat;
+
+    if (root.classList.contains('plus-disable-anim') !== disableAnim ||
+        root.classList.contains('plus-disable-blur') !== disableBlur ||
+        root.classList.contains('plus-hide-ai') !== hideAi) {
+        root.classList.toggle('plus-disable-anim', disableAnim);
+        root.classList.toggle('plus-disable-blur', disableBlur);
+        root.classList.toggle('plus-hide-ai', hideAi);
+    }
+});
+
+if (document.documentElement) {
+    classObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+} else {
+    document.addEventListener('DOMContentLoaded', () => {
+        classObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    }, { once: true });
+}
+
 function syncSettings() {
-    chrome.storage.local.get(['customList', 'enableCustom', 'mode', 'modifyConfig'], (items) => {
+    chrome.storage.local.get({
+        customList: [],
+        enableCustom: false,
+        mode: 'replace',
+        modifyConfig: { add: [], del: [], rename: {} },
+        enableAnimation: true,
+        enableBlur: true,
+        hideAiChat: true
+    }, (items) => {
         // 同步开关
         updateLocalStorage('17PLUS_ENABLE', items.enableCustom ? 'true' : 'false');
         
@@ -73,6 +116,9 @@ function syncSettings() {
         if (items.modifyConfig) {
             updateLocalStorage('17PLUS_CONFIG_MODIFY', items.modifyConfig);
         }
+
+        // 应用界面外观设置
+        applyUISettings(items);
     });
 }
 
