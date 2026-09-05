@@ -59,15 +59,31 @@
                 const json = JSON.parse(xhr.responseText);
                 if (json.data && json.data.classList) {
                     json.data.classList.forEach(cls => {
+                        if (cls.studentList && cls.studentList.length > 0) {
+                            const rawStudents = cls.studentList.map(s => {
+                                const numStr = String(s.studentNumber || '').slice(-2);
+                                const sNo = parseInt(numStr, 10);
+                                return {
+                                    name: s.stuName,
+                                    studentNumber: s.studentNumber,
+                                    studentNo: isNaN(sNo) ? 0 : sNo
+                                };
+                            }).filter(s => s.name);
+                            notifyOriginalStudents(rawStudents);
+                        }
+
                         // 字段映射：该接口使用 stuName, stuId, studentNumber
                         const adapter = {
                             nameField: 'stuName',
                             idField: 'stuId',
-                            createItem: (name, idx) => ({
-                                stuId: 880000000 + idx, // 使用大额ID避免冲突
-                                studentNumber: "C" + (20250000 + idx),
-                                stuName: name
-                            })
+                            createItem: (name, idx, stuNo) => {
+                                const noStr = stuNo !== undefined ? String(stuNo).padStart(2, '0') : String(idx + 1).padStart(2, '0');
+                                return {
+                                    stuId: 880000000 + idx,
+                                    studentNumber: "2025" + noStr,
+                                    stuName: name
+                                };
+                            }
                         };
                         
                         cls.studentList = applyListLogic(cls.studentList, config, adapter);
@@ -84,6 +100,11 @@
                 const json = JSON.parse(xhr.responseText);
                 if (json.data && Array.isArray(json.data)) {
                     json.data.forEach(cls => {
+                        if (cls.list && cls.list.length > 0) {
+                            const rawNames = cls.list.map(s => s.studentName).filter(Boolean);
+                            notifyOriginalStudents(rawNames);
+                        }
+
                         // 字段映射：该接口使用 studentName, studentId, avatorUrl
                         const adapter = {
                             nameField: 'studentName',
@@ -114,12 +135,28 @@
     function applyListLogic(originalList, config, adapter) {
         let resultList = [];
 
+        const getNo = (item) => {
+            const num = parseInt(String(item.studentNumber || '').slice(-2), 10);
+            return isNaN(num) ? 0 : num;
+        };
+
+        // 按 studentNumber 的最后两位学号升序排序
+        let sortedOriginal = originalList ? [...originalList] : [];
+        sortedOriginal.sort((a, b) => getNo(a) - getNo(b));
+
+        // 获取原名单中最大的学号
+        let maxOrigNo = 0;
+        sortedOriginal.forEach(item => {
+            const no = getNo(item);
+            if (no > maxOrigNo) maxOrigNo = no;
+        });
+
         // === 完全替换 ===
         if (config.mode === 'replace') {
             if (config.replaceList && config.replaceList.length > 0) {
                 resultList = config.replaceList.map((name, i) => adapter.createItem(name, i));
             } else {
-                resultList = originalList; // 如果替换列表为空，保持原样
+                resultList = sortedOriginal;
             }
         } 
         
@@ -127,11 +164,10 @@
         else if (config.mode === 'modify') {
             const { add, del, rename } = config.modifyConfig;
             
-            // 复制原始列表
-            let currentList = originalList ? [...originalList] : [];
+            // 复制按学号排好序的原始列表
+            let currentList = [...sortedOriginal];
 
-            // 执行删除 (Filter)
-            // 如果 del 列表包含该名字，则过滤掉
+            // 执行删除 (Filter) - 删除某人后，其余人员保持原学号与顺序不变
             if (del && del.length > 0) {
                 currentList = currentList.filter(item => {
                     const name = item[adapter.nameField];
@@ -140,7 +176,6 @@
             }
 
             // 执行修改 (Map)
-            // 检查 rename Map 是否有匹配的 key
             if (rename) {
                 currentList.forEach(item => {
                     const oldName = item[adapter.nameField];
@@ -150,9 +185,12 @@
                 });
             }
 
-            // 执行添加 (Push)
+            // 执行添加 (Push) - 学号在原名单最大学号之后依次递增
             if (add && add.length > 0) {
-                const newItems = add.map((name, i) => adapter.createItem(name, Date.now() + i));
+                const newItems = add.map((name, i) => {
+                    const newNo = maxOrigNo + 1 + i;
+                    return adapter.createItem(name, i, newNo);
+                });
                 currentList = currentList.concat(newItems);
             }
 
@@ -169,3 +207,11 @@
         console.log('[17PLUS] 名单数据已修改');
     }
 })();
+
+function notifyOriginalStudents(names) {
+        if (!Array.isArray(names) || names.length === 0) return;
+        try {
+            localStorage.setItem('17PLUS_ORIGINAL_STUDENTS', JSON.stringify(names));
+        } catch (e) {}
+        window.postMessage({ type: '17PLUS_CAPTURED_STUDENTS', names: names }, '*');
+}

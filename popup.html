@@ -33,7 +33,7 @@
         <!-- 头部标题 -->
         <div class="header-card">
             <div class="title-wrap">
-                <h3>17PLUS 设置</h3>
+                <h3>17PLUS</h3>
                 <a href="https://satinau.cn/" target="_blank" rel="noopener noreferrer" class="author-link">by SatinAu</a>
             </div>
         </div>
@@ -77,29 +77,22 @@
 
             <!-- 增删改模式面板 -->
             <div id="panel-modify" class="glass-panel">
-                <div class="modify-group">
-                    <div class="panel-header">
-                        <span class="step-badge">1</span>
-                        <h4>添加学生 (每行一个):</h4>
+                <div class="panel-header modify-header-bar">
+                    <div class="panel-header-left">
+                        <svg class="panel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        <h4>学生名单 (<span id="modifyCount">0</span>人)</h4>
                     </div>
-                    <textarea id="addList" placeholder="新同学A&#10;新同学B"></textarea>
+                    <button type="button" class="btn-text" id="btnResetModify" title="恢复为网页获取到的原名单">重置</button>
                 </div>
 
-                <div class="modify-group">
-                    <div class="panel-header">
-                        <span class="step-badge">2</span>
-                        <h4>删除学生 (每行一个):</h4>
-                    </div>
-                    <textarea id="delList" placeholder="要删除的名字A"></textarea>
-                </div>
+                <div class="student-list-container" id="studentListContainer"></div>
 
-                <div class="modify-group">
-                    <div class="panel-header">
-                        <span class="step-badge">3</span>
-                        <h4>修改名字 (旧名=新名):</h4>
-                    </div>
-                    <div class="note-chip">例如: 张三=张三丰</div>
-                    <textarea id="renameList" placeholder="张三=张三丰&#10;李四=李小四"></textarea>
+                <div class="add-student-box">
+                    <input type="text" id="addStudentInput" placeholder="输入新学生姓名..." maxlength="20">
+                    <button type="button" id="btnAddStudent" class="btn-add-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        <span>添加</span>
+                    </button>
                 </div>
             </div>
         </div>

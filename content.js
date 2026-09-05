@@ -131,3 +131,18 @@ chrome.storage.onChanged.addListener((changes, area) => {
         syncSettings(); // 简单起见，任何变化都重新全量同步一次
     }
 });
+
+// 监听并保存网页捕获的原班学生名单
+window.addEventListener('message', (event) => {
+    if (event.source !== window || !event.data) return;
+    if (event.data.type === '17PLUS_CAPTURED_STUDENTS' && Array.isArray(event.data.names)) {
+        chrome.storage.local.set({ originalStudents: event.data.names });
+    }
+});
+
+try {
+    const cachedStudents = localStorage.getItem('17PLUS_ORIGINAL_STUDENTS');
+    if (cachedStudents) {
+        chrome.storage.local.set({ originalStudents: JSON.parse(cachedStudents) });
+    }
+} catch (e) {}

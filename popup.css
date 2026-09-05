@@ -335,10 +335,183 @@ h4 {
   margin-bottom: 6px;
 }
 
-.modify-group:not(:last-child) {
-  margin-bottom: 12px;
-  padding-bottom: 10px;
-  border-bottom: 1px dashed light-dark(rgba(0, 0, 0, 0.08), rgba(255, 255, 255, 0.1));
+/* ========== 可视化名单列表 (增删改模式) ========== */
+.modify-header-bar {
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.panel-header-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-text {
+  background: none;
+  border: none;
+  font-size: 11px;
+  color: var(--primary-color);
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: opacity 0.2s ease;
+}
+
+.btn-text:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.student-list-container {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  padding-right: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.student-list-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.student-list-container::-webkit-scrollbar-thumb {
+  background-color: light-dark(rgba(0, 0, 0, 0.15), rgba(255, 255, 255, 0.2));
+  border-radius: 4px;
+}
+
+.student-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  background: light-dark(rgba(255, 255, 255, 0.6), rgba(0, 0, 0, 0.2));
+  border: 1px solid light-dark(rgba(0, 0, 0, 0.06), rgba(255, 255, 255, 0.08));
+  border-radius: var(--border-radius-sm);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.student-item:hover, .student-item:focus-within {
+  border-color: var(--primary-color);
+  background: light-dark(rgba(255, 255, 255, 0.85), rgba(0, 0, 0, 0.35));
+}
+
+.student-idx {
+  font-size: 11px;
+  color: var(--word-sub-color);
+  min-width: 18px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.student-item-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--word-color);
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 4px 0;
+  outline: none;
+  width: 100%;
+}
+
+.student-tag {
+  font-size: 9.5px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.student-tag-new {
+  color: #34c759;
+  background: rgba(52, 199, 89, 0.12);
+}
+
+.student-tag-mod {
+  color: #ff9500;
+  background: rgba(255, 149, 0, 0.12);
+}
+
+.btn-del-item {
+  background: transparent;
+  border: none;
+  padding: 4px;
+  color: var(--word-sub-color);
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.btn-del-item:hover {
+  color: #ff3b30;
+  background: rgba(255, 59, 48, 0.1);
+}
+
+.btn-del-item svg {
+  width: 13px;
+  height: 13px;
+}
+
+.add-student-box {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.add-student-box input {
+  flex: 1;
+  padding: 6px 10px;
+  background: light-dark(rgba(255, 255, 255, 0.6), rgba(0, 0, 0, 0.25));
+  border: 1px solid light-dark(rgba(0, 0, 0, 0.08), rgba(255, 255, 255, 0.12));
+  border-radius: var(--border-radius-sm);
+  font-size: 12px;
+  color: var(--word-color);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.add-student-box input:focus {
+  border-color: var(--primary-color);
+}
+
+.btn-add-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  background: var(--primary-color);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+
+.btn-add-item:hover {
+  opacity: 0.9;
+}
+
+.btn-add-item svg {
+  width: 13px;
+  height: 13px;
+}
+
+.modify-empty-tip {
+  font-size: 11px;
+  color: var(--word-sub-color);
+  text-align: center;
+  padding: 16px 0;
+  line-height: 1.5;
 }
 
 /* ========== Textarea 样式 ========== */
