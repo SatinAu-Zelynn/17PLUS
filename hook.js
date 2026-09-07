@@ -58,20 +58,25 @@
             try {
                 const json = JSON.parse(xhr.responseText);
                 if (json.data && json.data.classList) {
-                    json.data.classList.forEach(cls => {
-                        if (cls.studentList && cls.studentList.length > 0) {
-                            const rawStudents = cls.studentList.map(s => {
-                                const numStr = String(s.studentNumber || '').slice(-2);
-                                const sNo = parseInt(numStr, 10);
-                                return {
-                                    name: s.stuName,
-                                    studentNumber: s.studentNumber,
-                                    studentNo: isNaN(sNo) ? 0 : sNo
-                                };
-                            }).filter(s => s.name);
-                            notifyOriginalStudents(rawStudents);
-                        }
+                    const capturedClasses = json.data.classList.map(cls => {
+                        const rawStudents = (cls.studentList || []).map(s => {
+                            const numStr = String(s.studentNumber || '').slice(-2);
+                            const sNo = parseInt(numStr, 10);
+                            return {
+                                name: s.stuName,
+                                studentNumber: s.studentNumber,
+                                studentNo: isNaN(sNo) ? 0 : sNo
+                            };
+                        }).filter(s => s.name);
+                        return {
+                            classId: cls.classId,
+                            className: cls.className || `班级(${cls.classId})`,
+                            students: rawStudents
+                        };
+                    });
+                    notifyOriginalClasses(capturedClasses);
 
+                    json.data.classList.forEach(cls => {
                         // 字段映射：该接口使用 stuName, stuId, studentNumber
                         const adapter = {
                             nameField: 'stuName',
@@ -86,7 +91,7 @@
                             }
                         };
                         
-                        cls.studentList = applyListLogic(cls.studentList, config, adapter);
+                        cls.studentList = applyListLogic(cls.studentList, config, adapter, cls.classId);
                         cls.allHaveStuNumber = 1;
                     });
                     overrideResponse(xhr, json);
@@ -100,11 +105,6 @@
                 const json = JSON.parse(xhr.responseText);
                 if (json.data && Array.isArray(json.data)) {
                     json.data.forEach(cls => {
-                        if (cls.list && cls.list.length > 0) {
-                            const rawNames = cls.list.map(s => s.studentName).filter(Boolean);
-                            notifyOriginalStudents(rawNames);
-                        }
-
                         // 字段映射：该接口使用 studentName, studentId, avatorUrl
                         const adapter = {
                             nameField: 'studentName',
@@ -118,7 +118,7 @@
                             })
                         };
 
-                        cls.list = applyListLogic(cls.list, config, adapter);
+                        cls.list = applyListLogic(cls.list, config, adapter, cls.classId);
                     });
                     overrideResponse(xhr, json);
                 }
@@ -132,7 +132,7 @@
      * @param {Object} config 全局配置对象
      * @param {Object} adapter 针对不同接口的字段适配器
      */
-    function applyListLogic(originalList, config, adapter) {
+    function applyListLogic(originalList, config, adapter, classId) {
         let resultList = [];
 
         const getNo = (item) => {
@@ -162,7 +162,11 @@
         
         // === 增删改 ===
         else if (config.mode === 'modify') {
-            const { add, del, rename } = config.modifyConfig;
+            // 获取对应班级的配置，向前兼容旧版结构
+            const classConfig = (config.modifyConfig && classId && config.modifyConfig[classId])
+                ? config.modifyConfig[classId]
+                : (config.modifyConfig && Array.isArray(config.modifyConfig.add) ? config.modifyConfig : { add: [], del: [], rename: {} });
+            const { add, del, rename } = classConfig;
             
             // 复制按学号排好序的原始列表
             let currentList = [...sortedOriginal];
@@ -208,10 +212,10 @@
     }
 })();
 
-function notifyOriginalStudents(names) {
-        if (!Array.isArray(names) || names.length === 0) return;
-        try {
-            localStorage.setItem('17PLUS_ORIGINAL_STUDENTS', JSON.stringify(names));
-        } catch (e) {}
-        window.postMessage({ type: '17PLUS_CAPTURED_STUDENTS', names: names }, '*');
+function notifyOriginalClasses(classes) {
+    if (!Array.isArray(classes) || classes.length === 0) return;
+    try {
+        localStorage.setItem('17PLUS_ORIGINAL_CLASSES', JSON.stringify(classes));
+    } catch (e) {}
+    window.postMessage({ type: '17PLUS_CAPTURED_CLASSES', classes: classes }, '*');
 }

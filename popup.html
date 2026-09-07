@@ -77,12 +77,17 @@
 
             <!-- 增删改模式面板 -->
             <div id="panel-modify" class="glass-panel">
+                <!-- 班级分段选择器 -->
+                <div class="segmented-control class-nav" id="classControl" style="display: none;">
+                    <div class="segment-glider"></div>
+                </div>
+
                 <div class="panel-header modify-header-bar">
                     <div class="panel-header-left">
                         <svg class="panel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                         <h4>学生名单 (<span id="modifyCount">0</span>人)</h4>
                     </div>
-                    <button type="button" class="btn-text" id="btnResetModify" title="恢复为网页获取到的原名单">重置</button>
+                    <button type="button" class="btn-text" id="btnResetModify" title="恢复当前班级为抓取到的原名单">重置当前班</button>
                 </div>
 
                 <div class="student-list-container" id="studentListContainer"></div>
@@ -93,6 +98,18 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         <span>添加</span>
                     </button>
+                </div>
+
+                <!-- 已修改和已删除状态列表 -->
+                <div class="diff-summary-container" id="diffSummaryContainer">
+                    <div class="diff-group" id="modGroup" style="display: none;">
+                        <div class="diff-group-title">已修改 (<span id="modCount">0</span>)</div>
+                        <div class="diff-chip-list" id="modList"></div>
+                    </div>
+                    <div class="diff-group" id="delGroup" style="display: none;">
+                        <div class="diff-group-title">已删除 (<span id="delCount">0</span>) - 点击恢复</div>
+                        <div class="diff-chip-list" id="delList"></div>
+                    </div>
                 </div>
             </div>
         </div>

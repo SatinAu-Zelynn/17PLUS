@@ -628,3 +628,78 @@ textarea::-webkit-scrollbar-thumb {
   display: block;
   animation: blurFadeUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
+
+/* 班级切换滑块 */
+.class-nav {
+  margin-bottom: 10px;
+  overflow-x: auto;
+}
+
+.class-nav::-webkit-scrollbar {
+  display: none;
+}
+
+/* 已修改与已删除信息汇总区 */
+.diff-summary-container {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px dashed light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.12));
+  padding-top: 8px;
+}
+
+.diff-group-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--word-sub-color);
+  margin-bottom: 4px;
+}
+
+.diff-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.diff-chip {
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: default;
+}
+
+.diff-chip-mod {
+  background: rgba(255, 149, 0, 0.12);
+  color: #ff9500;
+}
+
+.diff-chip-del {
+  background: rgba(255, 59, 48, 0.12);
+  color: #ff3b30;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.diff-chip-del:hover {
+  background: rgba(255, 59, 48, 0.22);
+}
+
+.diff-chip-action {
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.diff-chip-mod {
+  background: rgba(255, 149, 0, 0.12);
+  color: #ff9500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.diff-chip-mod:hover {
+  background: rgba(255, 149, 0, 0.22);
+}

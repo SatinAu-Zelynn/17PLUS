@@ -132,17 +132,17 @@ chrome.storage.onChanged.addListener((changes, area) => {
     }
 });
 
-// 监听并保存网页捕获的原班学生名单
+// 监听并保存网页捕获的班级及学生名单
 window.addEventListener('message', (event) => {
     if (event.source !== window || !event.data) return;
-    if (event.data.type === '17PLUS_CAPTURED_STUDENTS' && Array.isArray(event.data.names)) {
-        chrome.storage.local.set({ originalStudents: event.data.names });
+    if (event.data.type === '17PLUS_CAPTURED_CLASSES' && Array.isArray(event.data.classes)) {
+        chrome.storage.local.set({ originalClasses: event.data.classes });
     }
 });
 
 try {
-    const cachedStudents = localStorage.getItem('17PLUS_ORIGINAL_STUDENTS');
-    if (cachedStudents) {
-        chrome.storage.local.set({ originalStudents: JSON.parse(cachedStudents) });
+    const cachedClasses = localStorage.getItem('17PLUS_ORIGINAL_CLASSES');
+    if (cachedClasses) {
+        chrome.storage.local.set({ originalClasses: JSON.parse(cachedClasses) });
     }
 } catch (e) {}
